@@ -155,11 +155,11 @@ new Chart(document.getElementById('lineChart'), {
         datasets: [{
             label: 'Productivity Score',
             data: {{ score_data|safe }},
-            borderColor: '#2EE59D',
+            borderColor: '{{ score_color }}',
             backgroundColor: 'rgba(46,229,157,0.1)',
             tension: 0.4,
             fill: true,
-            pointBackgroundColor: '#2EE59D',
+            pointBackgroundColor: '{{ score_color }}',
             pointRadius: 5,
         }]
     },
