@@ -1,0 +1,74 @@
+{% extends 'analytics/base.html' %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports & Insights{% endblock %}
+{% block page_sub %}Weekly summaries and smart recommendations{% endblock %}
+
+{% block content %}
+
+<div class="chart-grid">
+
+    <!-- WEEKLY SUMMARY CARD -->
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Weekly Summary</div>
+                <div class="section-sub">Last 7 days</div>
+            </div>
+        </div>
+        <div class="report-row">
+            <span class="report-row-label">Total Screen Time</span>
+            <span class="report-row-value">{{ format_total }}</span>
+        </div>
+        <div class="report-row">
+            <span class="report-row-label">Daily Average</span>
+            <span class="report-row-value">{{ format_avg }}</span>
+        </div>
+        {% for day, time in formatted_trend.items %}
+        <div class="report-row">
+            <span class="report-row-label">{{ day }}</span>
+            <span class="report-row-value">{{ time }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- CATEGORY BREAKDOWN CARD -->
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Category Totals</div>
+                <div class="section-sub">All-time usage by category</div>
+            </div>
+        </div>
+        {% for category, minutes in category_breakdown.items %}
+        <div class="report-row">
+            <span class="report-row-label">
+                <span class="badge badge-{{ category|lower }}">{{ category }}</span>
+            </span>
+            <span class="report-row-value">
+                {{ minutes }} min
+                <span style="font-size:.76rem; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-weight:400;">
+                    ({{ minutes|floatformat:0 }}m)
+                </span>
+            </span>
+        </div>
+        {% empty %}
+        <p style="color:var(--text-muted); font-size:.88rem; margin-top:12px;">No data yet.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- AI INSIGHTS -->
+<div class="card">
+    <div class="section-header">
+        <div>
+            <div class="section-title">Smart Insights</div>
+            <div class="section-sub">Personalized recommendations based on your data</div>
+        </div>
+    </div>
+    {% for insight in insights %}
+    <div class="insight-item">{{ insight }}</div>
+    {% endfor %}
+</div>
+
+{% endblock %}

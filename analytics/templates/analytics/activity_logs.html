@@ -1,0 +1,96 @@
+{% extends 'analytics/base.html' %}
+{% block title %}Activity Logs{% endblock %}
+{% block page_title %}Activity Logs{% endblock %}
+{% block page_sub %}All your screen time entries{% endblock %}
+
+{% block content %}
+
+<!-- FILTER BAR -->
+<form method="get">
+    <div class="filter-bar">
+        <input type="text" name="search" placeholder="🔍 Search app name..." value="{{ search_query }}" />
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for val, label in categories %}
+            <option value="{{ val }}" {% if val == category_filter %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="sort">
+            <option value="-date" {% if sort_by == '-date' %}selected{% endif %}>Sort: Newest First</option>
+            <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Sort: Oldest First</option>
+            <option value="-duration_minutes" {% if sort_by == '-duration_minutes' %}selected{% endif %}>Sort: Longest First</option>
+            <option value="duration_minutes" {% if sort_by == 'duration_minutes' %}selected{% endif %}>Sort: Shortest First</option>
+        </select>
+        <button type="submit" class="btn-primary">Apply</button>
+        <a href="{% url 'activity_logs' %}" style="padding:10px 16px; color:var(--text-muted); font-size:.88rem; text-decoration:none; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">Clear</a>
+    </div>
+</form>
+
+<div class="card">
+    {% if page_obj.object_list %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>App Name</th>
+                <th>Category</th>
+                <th>Duration</th>
+                <th>Impact</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in page_obj %}
+            <tr>
+                <td style="font-family:'Space Mono',monospace; font-size:.82rem; color:var(--text-muted);">{{ log.date|date:"M j, Y" }}</td>
+                <td style="font-weight:600;">{{ log.app_name }}</td>
+                <td>
+                    <span class="badge badge-{{ log.category|lower|slugify }}">{{ log.category }}</span>
+                </td>
+                <td style="font-family:'Space Mono',monospace; font-size:.88rem;">
+                    {{ log.duration_minutes }} min
+                </td>
+                <td>
+                    <span style="font-size:.82rem; color:
+                        {% if log.get_productivity_impact == 'Positive' %}var(--green)
+                        {% elif log.get_productivity_impact == 'Negative' %}var(--red)
+                        {% else %}var(--yellow){% endif %};">
+                        {{ log.get_productivity_impact }}
+                    </span>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'delete_log' log.pk %}" onsubmit="return confirm('Delete this log?');" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-danger">🗑️ Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">‹</a>
+        {% endif %}
+
+        <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">»</a>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div style="text-align:center; padding:60px 0; color:var(--text-muted);">
+        <div style="font-size:3rem; margin-bottom:16px;"><svg class="svg-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h12v2H6V5zm0 4h12v10H6V9zm2 2v6h8v-6H8z"/></svg></div>
+        <div style="font-size:1rem; font-weight:600; color:var(--text);">No logs found</div>
+        <div style="font-size:.88rem; margin-top:6px;">Try a different filter or <a href="{% url 'add_log' %}" style="color:var(--blue);">add a new entry</a>.</div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'analytics/base.html' %}
+{% block title %}Import Screen Time Data{% endblock %}
+{% block page_title %}Import Screen Time Data{% endblock %}
+{% block page_sub %}Upload a CSV file to import multiple logs at once{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:720px; margin:auto;">
+    <div class="section-header">
+        <div>
+            <div class="section-title">Upload & Import</div>
+            <div class="section-sub">CSV format: app_name,category,duration,date,notes</div>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="form-label">CSV File</label>
+            <input type="file" name="import_file" accept=".csv,text/csv" class="form-input" required>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; align-items:center;">
+            <button type="submit" class="btn-primary">Upload & Import</button>
+            <a href="{% url 'dashboard' %}" style="color:var(--text-muted); font-size:.88rem; text-decoration:none;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

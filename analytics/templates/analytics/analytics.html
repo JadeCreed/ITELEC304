@@ -1,0 +1,176 @@
+{% extends 'analytics/base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+{% block page_sub %}Deep insights into your digital behavior{% endblock %}
+
+{% block content %}
+
+<div class="metric-grid">
+    <div class="card">
+        <div class="section-title">Quick summary</div>
+        <div class="section-sub">Key metrics and what they mean</div>
+        <div class="insight-item" style="margin-top:12px;">Total tracked screen time: <strong>{{ total_all_time }} minutes</strong>.</div>
+        <div class="insight-item">Top category: <strong>{{ top_category }}</strong> ({{ top_percent }}% of all time).</div>
+        <div class="insight-item">Today's focus time: <strong>{{ focus_data.focus }} min</strong>, distraction time: <strong>{{ focus_data.distraction }} min</strong>.</div>
+        <div class="insight-item">Focus ratio: <strong>{{ focus_ratio }}%</strong>; Distraction ratio: <strong>{{ distraction_ratio }}%</strong>.</div>
+        <div class="insight-item">Today's productivity score: <strong style="color: {{ score_color }};">{{ today_score }} / 100</strong> — <strong>{{ score_level }}</strong>.</div>
+        <div class="insight-item">Productivity score is calculated from category weights: Study/Work positive, Social/Gaming negative, Entertainment neutral.</div>
+    </div>
+    <div class="card">
+        <div class="section-title">Read this dashboard</div>
+        <div class="section-sub">How to interpret the charts</div>
+        <div class="insight-item" style="margin-top:12px;">Bar chart: daily total minutes for the last 7 days.</div>
+        <div class="insight-item">Pie chart: how your total app time is divided by category.</div>
+        <div class="insight-item">Donut chart: today's focus vs distraction ratio.</div>
+        <div class="insight-item">Line chart: productivity score over time, where higher means more productive use.</div>
+        <div class="insight-item" style="margin-top:12px;">Productivity score is based on Study/Work being positive and Social/Gaming being negative.</div>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+    <div class="section-title">Insights</div>
+    <div class="section-sub">Automatic summary generated from your data</div>
+    <ul style="margin-top:12px; padding-left:18px; color:var(--text);">
+        {% for insight in insights %}
+            <li style="margin-bottom:10px; font-size:0.95rem;">{{ insight }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="chart-grid">
+
+    <div class="card chart-full">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Daily Screen Time — Last 7 Days</div>
+                <div class="section-sub">Total minutes per day</div>
+            </div>
+        </div>
+        <canvas id="barChart" height="100"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">App Category Distribution</div>
+                <div class="section-sub">All-time breakdown</div>
+            </div>
+        </div>
+        <canvas id="pieChart" height="220"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Focus vs Distraction</div>
+                <div class="section-sub">Today's ratio</div>
+            </div>
+        </div>
+        <canvas id="donutChart" height="220"></canvas>
+    </div>
+
+    <div class="card chart-full">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Productivity Trend — Last 7 Days</div>
+                <div class="section-sub">Score out of 100</div>
+            </div>
+        </div>
+        <canvas id="lineChart" height="100"></canvas>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const COLORS = ['#4F8CFF','#2EE59D','#FF5C5C','#FFC857','#A78BFA'];
+
+// Bar chart
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ weekly_labels|safe }},
+        datasets: [{
+            label: 'Minutes',
+            data: {{ weekly_data|safe }},
+            backgroundColor: 'rgba(79,140,255,0.25)',
+            borderColor: '#4F8CFF',
+            borderWidth: 2,
+            borderRadius: 8,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: '#2a2f3d' }, ticks: { color: '#7b82a0' } },
+            y: { grid: { color: '#2a2f3d' }, ticks: { color: '#7b82a0' } }
+        }
+    }
+});
+
+// Pie chart
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: {{ category_labels|safe }},
+        datasets: [{
+            data: {{ category_data|safe }},
+            backgroundColor: COLORS,
+            borderColor: '#13161e',
+            borderWidth: 3,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#7b82a0' } } }
+    }
+});
+
+// Donut chart
+new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ donut_labels|safe }},
+        datasets: [{
+            data: {{ donut_data|safe }},
+            backgroundColor: ['#2EE59D', '#FF5C5C'],
+            borderColor: '#13161e',
+            borderWidth: 3,
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '65%',
+        plugins: { legend: { labels: { color: '#7b82a0' } } }
+    }
+});
+
+// Line chart
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: {{ score_labels|safe }},
+        datasets: [{
+            label: 'Productivity Score',
+            data: {{ score_data|safe }},
+            borderColor: '#2EE59D',
+            backgroundColor: 'rgba(46,229,157,0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#2EE59D',
+            pointRadius: 5,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#7b82a0' } } },
+        scales: {
+            x: { grid: { color: '#2a2f3d' }, ticks: { color: '#7b82a0' } },
+            y: { grid: { color: '#2a2f3d' }, ticks: { color: '#7b82a0' }, min: 0, max: 100 }
+        }
+    }
+});
+</script>
+{% endblock %}

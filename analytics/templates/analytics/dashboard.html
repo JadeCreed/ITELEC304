@@ -1,0 +1,166 @@
+{% extends 'analytics/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_sub %}Overview of your screen time today{% endblock %}
+
+{% block content %}
+
+<!-- METRIC CARDS -->
+<div class="metric-grid">
+
+    <div class="card">
+        <div class="card-title">Total Screen Time Today</div>
+        <div class="card-value" style="color: var(--blue);">
+            {{ total_today|floatformat:0 }}<span style="font-size:1rem; color:var(--text-muted);"> min</span>
+        </div>
+        <div class="card-sub">{{ today }}</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Most Used App</div>
+        <div class="card-value" style="font-size:1.5rem; color:var(--green);">{{ most_used }}</div>
+        <div class="card-sub">Highest usage today</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Productivity Score</div>
+        <div class="card-value" style="color:
+            {% if productivity_score >= 70 %}var(--green)
+            {% elif productivity_score >= 40 %}var(--yellow)
+            {% else %}var(--red){% endif %};">
+            {{ productivity_score }}<span style="font-size:1rem; color:var(--text-muted);">/100</span>
+        </div>
+        <div class="card-sub">
+            {% if productivity_score >= 70 %}Excellent
+            {% elif productivity_score >= 40 %}Average
+            {% else %}Needs Improvement{% endif %}
+        </div>
+        <div style="font-size:.78rem; color:var(--text-muted); margin-top:8px; line-height:1.4;">
+            Higher score means more time on Study/Work apps and less time on Social/Gaming apps.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Focus vs Distraction</div>
+        <div style="display:flex; gap:20px; margin-top:8px;">
+            <div>
+                <div style="font-size:1.4rem; font-family:'Space Mono',monospace; font-weight:700; color:var(--green);">{{ focus_data.focus }}<span style="font-size:0.85rem;color:var(--text-muted);"> min</span></div>
+                <div style="font-size:0.78rem; color:var(--text-muted);">Focus</div>
+            </div>
+            <div style="color:var(--border); font-size:1.5rem;">|</div>
+            <div>
+                <div style="font-size:1.4rem; font-family:'Space Mono',monospace; font-weight:700; color:var(--red);">{{ focus_data.distraction }}<span style="font-size:0.85rem;color:var(--text-muted);"> min</span></div>
+                <div style="font-size:0.78rem; color:var(--text-muted);">Distraction</div>
+            </div>
+        </div>
+        <div style="font-size:.78rem; color:var(--text-muted); margin-top:8px; line-height:1.4;">
+            Focus = Study + Work; Distraction = Social + Gaming.
+        </div>
+    </div>
+
+</div>
+
+<!-- CHARTS -->
+<div class="chart-grid">
+
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Weekly Usage</div>
+                <div class="section-sub">Last 7 days in minutes</div>
+            </div>
+        </div>
+        <canvas id="weeklyChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">Category Breakdown</div>
+                <div class="section-sub">All time distribution</div>
+            </div>
+        </div>
+        <canvas id="categoryChart" height="200"></canvas>
+    </div>
+
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="card">
+    <div class="section-header">
+        <div>
+            <div class="section-title">Quick Actions</div>
+        </div>
+    </div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="{% url 'add_log' %}" class="btn-primary" style="text-decoration:none; display:inline-block;">Add Screen Time Log</a>
+        <a href="{% url 'import_data' %}" class="btn-primary" style="text-decoration:none; display:inline-block; background:var(--green); border-color:var(--green);">Upload & Import</a>
+        <a href="{% url 'analytics' %}" style="text-decoration:none; background:var(--bg3); color:var(--text); border:1px solid var(--border); padding:13px 24px; border-radius:10px; font-size:0.92rem; font-weight:600; transition:all .2s;">View Analytics</a>
+        <a href="{% url 'reports' %}" style="text-decoration:none; background:var(--bg3); color:var(--text); border:1px solid var(--border); padding:13px 24px; border-radius:10px; font-size:0.92rem; font-weight:600; transition:all .2s;">View Reports</a>
+    </div>
+    <div style="margin-top:20px; font-size:0.95rem; color:var(--text-muted); line-height:1.6;">
+        This dashboard shows today’s total screen time, the app you used most, a productivity score, and the split between Focus and Distraction minutes.
+        Use the charts below to compare daily trends and category usage over time.
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const COLORS = ['#4F8CFF','#2EE59D','#FF5C5C','#FFC857','#A78BFA'];
+
+// Weekly Bar Chart
+new Chart(document.getElementById('weeklyChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ weekly_labels|safe }},
+        datasets: [{
+            label: 'Minutes',
+            data: {{ weekly_data|safe }},
+            backgroundColor: 'rgba(79,140,255,0.25)',
+            borderColor: '#4F8CFF',
+            borderWidth: 2,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { color: '#2a2f3d' }, ticks: { color: '#7b82a0' } },
+            y: { grid: { color: '#2a2f3d' }, ticks: { color: '#7b82a0' } }
+        }
+    }
+});
+
+// Category Pie Chart
+const catLabels = {{ category_labels|safe }};
+const catData = {{ category_data|safe }};
+if (catData.length > 0) {
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: catLabels,
+            datasets: [{
+                data: catData,
+                backgroundColor: COLORS,
+                borderColor: '#13161e',
+                borderWidth: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: '#7b82a0', font: { size: 12 } }
+                }
+            }
+        }
+    });
+} else {
+    document.getElementById('categoryChart').parentElement.innerHTML +=
+        '<p style="text-align:center;color:var(--text-muted);font-size:.88rem;margin-top:40px;">No data yet — add some logs!</p>';
+}
+</script>
+{% endblock %}

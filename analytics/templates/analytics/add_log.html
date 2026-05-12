@@ -1,0 +1,101 @@
+{% extends 'analytics/base.html' %}
+{% block title %}Add Log{% endblock %}
+{% block page_title %}Add Log Entry{% endblock %}
+{% block page_sub %}Track your app usage manually{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 680px;">
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <div class="section-title">New Screen Time Entry</div>
+                <div class="section-sub">Fill in the details of your app usage</div>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label class="form-label">App Name</label>
+                    {{ form.app_name }}
+                    {% if form.app_name.errors %}
+                        <span style="color:var(--red);font-size:.8rem;">{{ form.app_name.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <span style="color:var(--red);font-size:.8rem;">{{ form.category.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Duration</label>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        {{ form.duration_value }}
+                        {{ form.duration_unit }}
+                    </div>
+                    {% if form.duration_value.errors %}
+                        <span style="color:var(--red);font-size:.8rem; display:block;">{{ form.duration_value.errors|join:", " }}</span>
+                    {% endif %}
+                    {% if form.duration_unit.errors %}
+                        <span style="color:var(--red);font-size:.8rem; display:block;">{{ form.duration_unit.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                        <span style="color:var(--red);font-size:.8rem;">{{ form.date.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group full">
+                    <label class="form-label">Notes (optional)</label>
+                    {{ form.notes }}
+                </div>
+
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:24px; align-items:center;">
+                <button type="submit" class="btn-primary">Save Log Entry</button>
+                <a href="{% url 'dashboard' %}" style="color:var(--text-muted);font-size:.88rem;text-decoration:none;">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- CATEGORY GUIDE -->
+    <div class="card" style="margin-top:20px;">
+        <div class="card-title">Category Scoring Guide</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+            <div style="padding:12px; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">
+                <span class="badge badge-study">Study</span>
+                <div style="font-size:.82rem; color:var(--text-muted); margin-top:6px;">+2.0 score • Highly productive</div>
+            </div>
+            <div style="padding:12px; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">
+                <span class="badge badge-work">Work</span>
+                <div style="font-size:.82rem; color:var(--text-muted); margin-top:6px;">+1.5 score • Productive</div>
+            </div>
+            <div style="padding:12px; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">
+                <span class="badge badge-entertainment">Entertainment</span>
+                <div style="font-size:.82rem; color:var(--text-muted); margin-top:6px;">0.0 score • Neutral</div>
+            </div>
+            <div style="padding:12px; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">
+                <span class="badge badge-social">Social</span>
+                <div style="font-size:.82rem; color:var(--text-muted); margin-top:6px;">-1.0 score • Distracting</div>
+            </div>
+            <div style="padding:12px; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">
+                <span class="badge badge-gaming">Gaming</span>
+                <div style="font-size:.82rem; color:var(--text-muted); margin-top:6px;">-1.5 score • High distraction</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
