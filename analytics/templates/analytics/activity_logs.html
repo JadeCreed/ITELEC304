@@ -9,6 +9,8 @@
 <form method="get">
     <div class="filter-bar">
         <input type="text" name="search" placeholder="🔍 Search app name..." value="{{ search_query }}" />
+        <button type="submit" class="btn-primary">Search</button>
+        <a href="{% url 'activity_logs' %}" style="padding:10px 16px; color:var(--text-muted); font-size:.88rem; text-decoration:none; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">Clear</a>
         <select name="category">
             <option value="">All Categories</option>
             {% for val, label in categories %}
@@ -21,12 +23,11 @@
             <option value="-duration_minutes" {% if sort_by == '-duration_minutes' %}selected{% endif %}>Sort: Longest First</option>
             <option value="duration_minutes" {% if sort_by == 'duration_minutes' %}selected{% endif %}>Sort: Shortest First</option>
         </select>
-        <button type="submit" class="btn-primary">Apply</button>
-        <a href="{% url 'activity_logs' %}" style="padding:10px 16px; color:var(--text-muted); font-size:.88rem; text-decoration:none; background:var(--bg3); border-radius:10px; border:1px solid var(--border);">Clear</a>
     </div>
 </form>
 
 <div class="card">
+    <div style="font-size:.88rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Impact guide: ● Positive = Study/Work · ● Negative = Social/Gaming · ● Neutral = Entertainment</div>
     {% if page_obj.object_list %}
     <table class="data-table">
         <thead>

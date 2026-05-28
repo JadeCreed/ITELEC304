@@ -7,14 +7,12 @@
 
 <div class="metric-grid">
     <div class="card">
-        <div class="section-title">Quick summary</div>
-        <div class="section-sub">Key metrics and what they mean</div>
-        <div class="insight-item" style="margin-top:12px;">Total tracked screen time: <strong>{{ total_all_time }} minutes</strong>.</div>
-        <div class="insight-item">Top category: <strong>{{ top_category }}</strong> ({{ top_percent }}% of all time).</div>
-        <div class="insight-item">Today's focus time: <strong>{{ focus_data.focus }} min</strong>, distraction time: <strong>{{ focus_data.distraction }} min</strong>.</div>
-        <div class="insight-item">Focus ratio: <strong>{{ focus_ratio }}%</strong>; Distraction ratio: <strong>{{ distraction_ratio }}%</strong>.</div>
-        <div class="insight-item">Today's productivity score: <strong style="color: {{ score_color }};">{{ today_score }} / 100</strong> — <strong>{{ score_level }}</strong>.</div>
-        <div class="insight-item">Productivity score is calculated from category weights: Study/Work positive, Social/Gaming negative, Entertainment neutral.</div>
+        <div class="section-title">📊 Quick summary</div>
+        <div class="section-sub">A friendlier explanation of your main numbers</div>
+        <div class="insight-item" style="margin-top:12px;">🕐 You have tracked <strong>{{ total_all_time }} minutes</strong> of screen time in total.</div>
+        <div class="insight-item">🏆 Your most-used category is <strong>{{ top_category }}</strong> — about <strong>{{ top_percent }}%</strong> of all tracked time.{% if top_category == 'Social' or top_category == 'Gaming' %} ⚠️ This is a distraction-heavy category.{% elif top_category == 'Study' or top_category == 'Work' %} ✅ This is a productive category. Great job!{% endif %}</div>
+        <div class="insight-item">🎯 Today you focused for <strong>{{ focus_data.focus }} min</strong> and got distracted for <strong>{{ focus_data.distraction }} min</strong>.</div>
+        <div class="insight-item">📈 Your productivity score today is <strong style="color: {{ score_color }};">{{ today_score }}/100 — {{ score_level }}</strong>.{% if today_score >= 70 %} That means your time is mostly going to Study or Work apps. 🎉{% elif today_score >= 40 %} You are doing okay, but try to spend more time on Study or Work apps.{% else %} Most of your time is going to Social or Gaming apps. Try to balance it out!{% endif %}</div>
     </div>
     <div class="card">
         <div class="section-title">Read this dashboard</div>
@@ -56,6 +54,7 @@
                 <div class="section-sub">All-time breakdown</div>
             </div>
         </div>
+        <div style="font-size:.82rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">🔵 Study/Work = productive · 🟡 Entertainment = neutral · 🔴 Social/Gaming = distracting</div>
         <canvas id="pieChart" height="220"></canvas>
     </div>
 

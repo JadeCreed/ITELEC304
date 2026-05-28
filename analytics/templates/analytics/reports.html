@@ -39,17 +39,12 @@
                 <div class="section-sub">All-time usage by category</div>
             </div>
         </div>
-        {% for category, minutes in category_breakdown.items %}
+        {% for category, item in formatted_breakdown.items %}
         <div class="report-row">
             <span class="report-row-label">
                 <span class="badge badge-{{ category|lower }}">{{ category }}</span>
             </span>
-            <span class="report-row-value">
-                {{ minutes }} min
-                <span style="font-size:.76rem; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-weight:400;">
-                    ({{ minutes|floatformat:0 }}m)
-                </span>
-            </span>
+            <span class="report-row-value">{{ item.formatted }}</span>
         </div>
         {% empty %}
         <p style="color:var(--text-muted); font-size:.88rem; margin-top:12px;">No data yet.</p>

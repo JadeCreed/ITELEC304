@@ -438,7 +438,24 @@
             display: flex;
             gap: 12px;
             margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 12px;
             flex-wrap: wrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: auto;
+            flex-wrap: nowrap;
         }
 
         .filter-bar input, .filter-bar select {
@@ -449,6 +466,15 @@
             color: var(--text);
             font-size: 0.88rem;
             font-family: 'DM Sans', sans-serif;
+            min-width: 150px;
+        }
+
+        .filter-bar input {
+            flex: 1 1 260px;
+        }
+
+        .filter-bar select {
+            flex: 0 1 180px;
         }
 
         .filter-bar input:focus, .filter-bar select:focus {

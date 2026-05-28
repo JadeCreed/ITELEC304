@@ -42,19 +42,32 @@
 
     <div class="card">
         <div class="card-title">Focus vs Distraction</div>
-        <div style="display:flex; gap:20px; margin-top:8px;">
+        <div style="display:flex; gap:20px; margin-top:8px; align-items:flex-end;">
             <div>
                 <div style="font-size:1.4rem; font-family:'Space Mono',monospace; font-weight:700; color:var(--green);">{{ focus_data.focus }}<span style="font-size:0.85rem;color:var(--text-muted);"> min</span></div>
-                <div style="font-size:0.78rem; color:var(--text-muted);">Focus</div>
+                <div style="font-size:0.78rem; color:var(--text-muted);">Focus (Study + Work)</div>
             </div>
             <div style="color:var(--border); font-size:1.5rem;">|</div>
             <div>
                 <div style="font-size:1.4rem; font-family:'Space Mono',monospace; font-weight:700; color:var(--red);">{{ focus_data.distraction }}<span style="font-size:0.85rem;color:var(--text-muted);"> min</span></div>
-                <div style="font-size:0.78rem; color:var(--text-muted);">Distraction</div>
+                <div style="font-size:0.78rem; color:var(--text-muted);">Distraction (Social + Gaming)</div>
             </div>
         </div>
+        {% with total=focus_data.focus|add:focus_data.distraction %}
+        {% if total %}
+        <div style="margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:.78rem; color:var(--text-muted); margin-bottom:6px;">
+                <span>Green = productive time</span>
+                <span>{{ focus_data.focus }} / {{ total }} min</span>
+            </div>
+            <div style="height:8px; border-radius:999px; background:rgba(255,92,92,0.18); overflow:hidden;">
+                <div style="height:100%; width:{% widthratio focus_data.focus total 100 %}%; background:linear-gradient(90deg, var(--green), #6cf5c8);"></div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
         <div style="font-size:.78rem; color:var(--text-muted); margin-top:8px; line-height:1.4;">
-            Focus = Study + Work; Distraction = Social + Gaming.
+            Green means productive time. Higher green = more Study/Work, lower red = less Social/Gaming.
         </div>
     </div>
 
@@ -71,6 +84,7 @@
             </div>
         </div>
         <canvas id="weeklyChart" height="200"></canvas>
+        <div style="font-size:.82rem; color:var(--text-muted); margin-top:10px; line-height:1.4;">📌 Taller bars = more screen time that day. Use this to spot your busiest days at a glance.</div>
     </div>
 
     <div class="card">
@@ -81,6 +95,7 @@
             </div>
         </div>
         <canvas id="categoryChart" height="200"></canvas>
+        <div style="font-size:.82rem; color:var(--text-muted); margin-top:10px; line-height:1.4;">📌 Blue/green slices usually mean productive apps. Red/pink slices often point to distraction.</div>
     </div>
 
 </div>

@@ -217,6 +217,11 @@ def reports_page(request):
         m = minutes % 60
         return f"{h}h {m}m"
 
+    formatted_breakdown = {
+        category: {'raw': minutes, 'formatted': format_time(minutes)}
+        for category, minutes in category_breakdown.items()
+    }
+
     formatted_trend = {
         day: format_time(mins)
         for day, mins in weekly_summary['trend'].items()
@@ -226,7 +231,7 @@ def reports_page(request):
         'weekly_summary': weekly_summary,
         'insights': insights,
         'category_breakdown': category_breakdown,
-        'formatted_trend': formatted_trend,
+        'formatted_breakdown': formatted_breakdown,
         'format_total': format_time(weekly_summary['total_week_minutes']),
         'format_avg': format_time(int(weekly_summary['avg_daily_minutes'])),
     }
